@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: livredor
+  name: livredor
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: livredor
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: livredor
+    spec:
+      containers:
+      - image: camarahamedy/livredor-ci:7a9c0c6f
+        name: livredor-ci
+        env:
+        - name: COULEUR
+          value: "violet"
+        - name: COLLECTION
+          value: "hiver"
+        resources: {}
+status: {}
