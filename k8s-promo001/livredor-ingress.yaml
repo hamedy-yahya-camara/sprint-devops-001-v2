@@ -1,0 +1,41 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: livredor
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: livredor.promo001.local
+    http:
+      paths:
+      - path: /statut
+        pathType: Prefix
+        backend:
+          service:
+            name: statut
+            port:
+              number: 80
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: livredor
+            port:
+              number: 80
+  - host: inspection-50caaeff.promo001.local
+    http:
+      paths:
+      - path: /statut
+        pathType: Prefix
+        backend:
+          service:
+            name: statut
+            port:
+              number: 80
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: livredor
+            port:
+              number: 80
