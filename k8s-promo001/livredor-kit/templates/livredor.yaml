@@ -1,35 +1,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    app: livredor
-  name: livredor
+  name: {{ .Release.Name }}
 spec:
-  replicas: 3
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: livredor
-  strategy: {}
+      app: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: livredor
+        app: {{ .Release.Name }}
     spec:
       containers:
-      - image: camarahamedy/livredor-ci:v2
-        name: livredor-ci
+      - name: livredor-ci
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        ports:
+        - containerPort: 3000
         env:
         - name: COULEUR
-          valueFrom:
-            configMapKeyRef:
-              name: boutique-config
-              key: COULEUR
-        - name: COLLECTION
-          value: "hiver"
+          value: {{ .Values.couleur }}
+        - name: DEVISE
+          value: {{ .Values.devise }}
         - name: DATABASE_URL
           valueFrom:
             secretKeyRef:
-              name: livredor-db
+              name: {{ .Release.Name }}-db
               key: DATABASE_URL
         readinessProbe:
           httpGet:
@@ -42,9 +38,6 @@ spec:
           initialDelaySeconds: 75
           periodSeconds: 10
           failureThreshold: 3
-        volumeMounts:
-        - name: donnees
-          mountPath: /data
         resources:
           requests:
             cpu: 50m
@@ -52,8 +45,14 @@ spec:
           limits:
             cpu: 300m
             memory: 256Mi
-      volumes:
-      - name: donnees
-        persistentVolumeClaim:
-          claimName: livredor-data
-status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  selector:
+    app: {{ .Release.Name }}
+  ports:
+  - port: 80
+    targetPort: 3000

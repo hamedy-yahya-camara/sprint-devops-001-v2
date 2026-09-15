@@ -1,0 +1,8 @@
+replicaCount: 3
+image:
+  repository: camarahamedy/livredor-ci
+  tag: v2
+couleur: violet
+devise: bienvenue
+motdepasse: promo001
+ingressClassName: traefik
