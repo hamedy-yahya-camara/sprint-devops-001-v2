@@ -35,3 +35,8 @@ variable "cle" {
   type      = string
   sensitive = true
 }
+variable "redemarrage" {
+  type        = string
+  default     = "no"
+  description = "Politique de redemarrage commune a toutes les boutiques"
+}

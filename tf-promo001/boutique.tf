@@ -2,26 +2,29 @@ resource "docker_network" "epreuve" {
   name = var.reseau
 }
 
-resource "docker_container" "epreuve" {
-  name  = var.conteneur
-  env   = ["CLE_CLIENT=${var.cle}"]
-  image = docker_image.nginx.image_id
+module "boutiques" {
+  source   = "./modules/boutique"
+  for_each = var.boutiques
 
-  ports {
-    internal = 80
-    external = var.port
-  }
+  nom         = each.value.nom
+  image       = docker_image.nginx.image_id
+  reseau      = docker_network.epreuve.name
+  port        = each.value.port
+  page        = each.value.page
+  cle         = var.cle
+  redemarrage = var.redemarrage
+}
 
-  networks_advanced {
-    name = docker_network.epreuve.name
-  }
+moved {
+  from = docker_container.epreuve
+  to   = module.boutique.docker_container.web
+}
 
-  upload {
-    content = local.page
-    file    = "/usr/share/nginx/html/index.html"
-  }
-
-  lifecycle {
-    ignore_changes = [env, ports, upload, networks_advanced]
-  }
+moved {
+  from = module.boutique
+  to   = module.boutiques["origine"]
+}
+moved {
+  from = module.boutiques["atelier"]
+  to   = module.boutiques["studio"]
 }
